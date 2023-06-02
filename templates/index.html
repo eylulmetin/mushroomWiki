@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mantar Külliyatı</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6e6fa; /* Lila renk (Lavanta) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #6a5acd; /* Orta Lila renk */
+        }
+
+        #upload-form {
+            margin-bottom: 20px;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .custom-button {
+            display: inline-block;
+            background-color: #6a5acd; /* Orta Lila renk */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+
+        .custom-button:last-child {
+            margin-right: 0;
+        }
+
+        .custom-button:hover {
+            background-color: #836fff; /* Açık Lila renk */
+        }
+
+        .custom-button:active {
+            background-color: #483d8b; /* Koyu Lila renk */
+        }
+
+        #result-container {
+            margin-top: 20px;
+        }
+
+        #uploaded-image {
+            max-width: 300px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WikiMantar</h1>
+        
+        <form id="upload-form" enctype="multipart/form-data">
+            <label for="file-input" class="custom-button">Görüntü Seçin</label>
+            <input type="file" id="file-input" accept="image/*" required>
+            <button type="submit" class="custom-button" style="background-color: #ccc;">Gönder</button>
+        </form>
+        
+        <div id="result-container"></div>
+        <img id="uploaded-image" src="" alt="Uploaded Image">
+    </div>
+    
+    <script>
+        const form = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
+        const resultContainer = document.getElementById('result-container');
+        const uploadedImage = document.getElementById('uploaded-image');
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const file = fileInput.files[0];
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('/api/endpoint', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.mushroom_name) {
+                    resultContainer.innerHTML = `<strong>Mantar Türü:</strong> ${result.mushroom_name}`;
+                } else {
+                    resultContainer.innerHTML = result.error;
+                }
+            })
+            .catch(error => {
+                resultContainer.innerHTML = 'Mantar sınıflandırma başarısız oldu.';
+            });
+        });
+        
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            
+            if (file) {
+                uploadedImage.src = URL.createObjectURL(file); // Görseli görüntüle
+                uploadedImage.style.display = 'block'; // Görüntüyü göster
+            }
+        });
+    </script>
+</body>
+</html>
